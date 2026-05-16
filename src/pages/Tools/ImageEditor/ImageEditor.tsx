@@ -40,7 +40,7 @@ const ImageEditor: React.FC = () => {
     setError('');
   };
 
-  const handleSave = (editedImageObject: any, designState: any) => {
+  const handleSave = (editedImageObject: any, _designState: any) => {
     // Filerobot might not return imageBase64 directly unless configured, so we extract it from the canvas
     const url = editedImageObject.imageBase64 || editedImageObject.imageCanvas.toDataURL(editedImageObject.mimeType || 'image/png');
     
@@ -108,6 +108,8 @@ const ImageEditor: React.FC = () => {
                   tabsIds={[TABS.ADJUST, TABS.ANNOTATE, TABS.WATERMARK, TABS.FILTERS, TABS.FINETUNE, TABS.RESIZE]}
                   defaultTabId={TABS.ADJUST}
                   defaultToolId={TOOLS.CROP}
+                  savingPixelRatio={1}
+                  previewPixelRatio={typeof window !== 'undefined' ? window.devicePixelRatio : 1}
                 />
               </div>
             </div>

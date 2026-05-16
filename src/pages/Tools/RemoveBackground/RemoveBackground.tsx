@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { removeBackground, Config } from '@imgly/background-removal';
+import { removeBackground, type Config } from '@imgly/background-removal';
 import styles from './RemoveBackground.module.css';
-import { Upload, X, Download, AlertTriangle, Zap, Image as ImageIcon, Eraser, Settings } from 'lucide-react';
+import { Upload, X, Download, AlertTriangle, Zap, Eraser, Settings } from 'lucide-react';
 
 const RemoveBackground: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -17,14 +17,7 @@ const RemoveBackground: React.FC = () => {
   useEffect(() => {
     const preloadModel = async () => {
       try {
-        const config: Config = {
-          publicPath: "https://static.remove-bg.io/assets/", // Optional: CDN for models if local doesn't work well
-          progress: (k, curr, total) => {
-            if (curr && total) {
-              // Preloading silently in background
-            }
-          }
-        };
+        // Variable removed to fix TS6133
         // Just touching the library helps warm it up
       } catch (e) {
         console.error('Preload failed', e);

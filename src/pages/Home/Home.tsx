@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { ArrowRight, Video, ImageIcon, Mic, FileText } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, Video, ImageIcon, Mic } from 'lucide-react';
 import styles from './Home.module.css';
 
 // ── MAGNETIC BUTTON COMPONENT ──
