@@ -1,0 +1,14 @@
+{
+  "lifetimeFiles": 2,
+  "lifetimeBytes": 12243232,
+  "lifetimeConverted": 0,
+  "lifetimeCompressed": 2,
+  "byDay": {
+    "2026-05-15": {
+      "files": 2,
+      "bytes": 12243232,
+      "converted": 0,
+      "compressed": 2
+    }
+  }
+}

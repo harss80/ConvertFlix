@@ -1,0 +1,313 @@
+.page {
+  padding: 4rem 2rem;
+  min-height: calc(100vh - 160px);
+  background-color: var(--bg-primary);
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 1200px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.headerIcon {
+  width: 64px;
+  height: 64px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0 var(--border-color);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 600px;
+}
+
+.mainContent {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.workspace {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  box-shadow: 6px 6px 0 var(--border-color);
+  padding: 2rem;
+  min-height: 400px;
+}
+
+.dropZone {
+  height: 100%;
+  min-height: 350px;
+  border: 2px dashed var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--bg-secondary);
+}
+
+.dropZone:hover {
+  background: var(--hover-color);
+}
+
+.fileInput {
+  display: none;
+}
+
+.uploadPrompt {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.uploadIcon {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.uploadPrompt h3 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.fileInfo {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.previewContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.clearButton {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 0 var(--border-color);
+}
+
+.clearButton:hover {
+  background: var(--hover-color);
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--border-color);
+}
+
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.imageCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.imageCard h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  border: 2px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.transparentBg {
+  background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), 
+                    linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+                    linear-gradient(45deg, transparent 75%, #ccc 75%), 
+                    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  border: 2px solid var(--border-color);
+}
+
+.transparentBg .previewImage {
+  border: none;
+  background: transparent;
+}
+
+.actionArea {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.processButton, .downloadButton {
+  width: 100%;
+  max-width: 400px;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+  box-shadow: 4px 4px 0 var(--border-color);
+}
+
+.processButton:hover:not(:disabled), .downloadButton:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--border-color);
+  background: var(--hover-color);
+  color: var(--text-primary);
+}
+
+.processButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 2px 2px 0 var(--border-color);
+}
+
+.spinning {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.progressWrapper {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.progressBar {
+  flex: 1;
+  height: 24px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--text-primary);
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-weight: 800;
+  min-width: 45px;
+}
+
+.errorAlert {
+  background: #ffeded;
+  color: #d32f2f;
+  border: 2px solid #d32f2f;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: bold;
+}
+
+.resultActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.infoCard {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  padding: 1.5rem;
+  box-shadow: 4px 4px 0 var(--border-color);
+}
+
+.infoCard h3 {
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  font-weight: 800;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.tipsList {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.tipsList li {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+  .comparisonGrid {
+    grid-template-columns: 1fr;
+  }
+}

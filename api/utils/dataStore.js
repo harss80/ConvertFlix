@@ -1,0 +1,321 @@
+const fs = require('fs');
+const fsp = require('fs').promises;
+const path = require('path');
+const realtime = require('./realtime');
+
+const DATA_DIR = path.join(__dirname, '..', 'data');
+
+async function ensureDir() {
+  try {
+    await fsp.mkdir(DATA_DIR, { recursive: true });
+  } catch (_) {}
+}
+
+function filePath(name) {
+  return path.join(DATA_DIR, `${name}.json`);
+}
+
+async function readJSON(name, fallback) {
+  await ensureDir();
+  const p = filePath(name);
+  try {
+    const raw = await fsp.readFile(p, 'utf-8');
+    return JSON.parse(raw);
+  } catch (e) {
+    if (e && (e.code === 'ENOENT' || e.code === 'EINVAL' || e.code === 'EISDIR')) {
+      return fallback;
+    }
+    throw e;
+  }
+}
+
+async function writeJSON(name, data) {
+  await ensureDir();
+  const p = filePath(name);
+  const tmp = p + '.tmp';
+  await fsp.writeFile(tmp, JSON.stringify(data, null, 2), 'utf-8');
+  await fsp.rename(tmp, p);
+}
+
+// Users
+async function getUsers() {
+  const users = await readJSON('users', []);
+  return Array.isArray(users) ? users : [];
+}
+
+async function saveUsers(users) {
+  await writeJSON('users', users || []);
+}
+
+// Settings
+const defaultSettings = {
+  siteName: 'ConvertFlix',
+  maxFileSize: 104857600,
+  allowedFormats: ['jpg', 'png', 'gif', 'webp', 'mp4', 'avi', 'mov', 'mp3', 'wav', 'pdf', 'docx'],
+  maintenanceMode: false,
+  emailNotifications: true,
+  adminNotifications: true,
+  autoDeleteDays: 7
+};
+
+async function getSettings() {
+  const settings = await readJSON('settings', defaultSettings);
+  return { ...defaultSettings, ...(settings || {}) };
+}
+
+async function saveSettings(settings) {
+  const merged = { ...defaultSettings, ...(settings || {}) };
+  await writeJSON('settings', merged);
+  return merged;
+}
+
+// Activities
+async function getActivities() {
+  const list = await readJSON('activities', []);
+  return Array.isArray(list) ? list : [];
+}
+
+async function addActivity(activity) {
+  if (!activity || typeof activity !== 'object') throw new Error('Activity must be an object');
+  const required = ['type', 'message', 'severity'];
+  const missing = required.filter(f => !(f in activity));
+  if (missing.length > 0) throw new Error(`Missing required fields: ${missing.join(', ')}`);
+  
+  const activities = await getActivities();
+  const newActivity = {
+    id: Date.now().toString(),
+    timestamp: new Date().toISOString(),
+    userId: null,
+    ...activity,
+  };
+  
+  activities.unshift(newActivity);
+  await saveActivities(activities);
+  
+  // Get settings to check if notifications are enabled
+  const settings = await getSettings().catch(() => ({}));
+  
+  // Emit to realtime subscribers if notifications are enabled
+  if (settings.adminNotifications !== false) {
+    realtime.emit('activity', newActivity);
+  }
+  
+  // If this is a site visit or new device, emit updated stats
+  if (newActivity.type === 'site_visit' || newActivity.type === 'new_device') {
+    try {
+      const { computeStats } = require('./stats');
+      const stats = await computeStats();
+      realtime.emit('stats', stats);
+      realtime.emit('stats_metrics_updated', { reason: newActivity.type });
+    } catch (error) {
+      console.error('Error computing stats after activity:', error);
+    }
+  }
+  
+  return newActivity;
+}
+
+// Save activities (used by retention pruning)
+async function saveActivities(list) {
+  await writeJSON('activities', Array.isArray(list) ? list : []);
+  return Array.isArray(list) ? list : [];
+}
+
+// Metrics (persistent dashboard counters)
+const defaultMetrics = {
+  lifetimeFiles: 0,         // total files processed historically
+  lifetimeBytes: 0,         // total input bytes processed historically
+  lifetimeConverted: 0,     // total files converted
+  lifetimeCompressed: 0,    // total files compressed
+  byDay: {}                 // { 'YYYY-MM-DD': { files, bytes, converted, compressed } }
+};
+
+async function getMetrics() {
+  const m = await readJSON('metrics', defaultMetrics);
+  // Ensure required fields and shapes
+  return {
+    ...defaultMetrics,
+    ...(m || {}),
+    byDay: { ...(m && m.byDay ? m.byDay : {}) }
+  };
+}
+
+async function saveMetrics(metrics) {
+  const toSave = {
+    ...defaultMetrics,
+    ...(metrics || {}),
+    byDay: { ...((metrics || {}).byDay || {}) }
+  };
+  await writeJSON('metrics', toSave);
+  return toSave;
+}
+
+function todayKey(date = new Date()) {
+  return date.toISOString().split('T')[0];
+}
+
+async function recordFileProcessed({ size = 0, kind = 'processed', when = new Date() } = {}) {
+  const m = await getMetrics();
+  m.lifetimeFiles = (m.lifetimeFiles || 0) + 1;
+  m.lifetimeBytes = (m.lifetimeBytes || 0) + (Number(size) || 0);
+  if (kind === 'converted') m.lifetimeConverted = (m.lifetimeConverted || 0) + 1;
+  if (kind === 'compressed') m.lifetimeCompressed = (m.lifetimeCompressed || 0) + 1;
+
+  const key = todayKey(when);
+  const day = m.byDay[key] || { files: 0, bytes: 0, converted: 0, compressed: 0 };
+  day.files += 1;
+  day.bytes += (Number(size) || 0);
+  if (kind === 'converted') day.converted += 1;
+  if (kind === 'compressed') day.compressed += 1;
+  m.byDay[key] = day;
+
+  // Optional: prune very old days to keep file small (keep last 90 days)
+  try {
+    // Keep only the last N days of daily metrics (N = settings.autoDeleteDays, default 7)
+    const settings = await getSettings().catch(() => ({}));
+    const keepDays = Number(settings && settings.autoDeleteDays) || 7;
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - keepDays * 24 * 60 * 60 * 1000);
+    for (const k of Object.keys(m.byDay)) {
+      const d = new Date(k);
+      if (d < cutoff) delete m.byDay[k];
+    }
+  } catch (_) {}
+
+  await saveMetrics(m);
+  try { realtime.emit('stats_metrics_updated', m); } catch (_) {}
+  // Also signal that files listing likely changed (new output file produced)
+  try { realtime.emit('files_updated', { reason: 'file_processed' }); } catch (_) {}
+  return m;
+}
+
+// Prune helpers for retention policy
+async function pruneActivities(days = 14) {
+  try {
+    const now = Date.now();
+    const cutoff = now - days * 24 * 60 * 60 * 1000;
+    const list = await getActivities();
+    const filtered = (list || []).filter(a => {
+      const ts = a && a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      return ts >= cutoff;
+    });
+    if (filtered.length !== (list || []).length) {
+      await saveActivities(filtered);
+    }
+    return { before: (list || []).length, after: filtered.length };
+  } catch (e) {
+    return { before: 0, after: 0 };
+  }
+}
+
+async function pruneMetricsByDay(days = 14) {
+  try {
+    const m = await getMetrics();
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    let changed = false;
+    for (const k of Object.keys(m.byDay || {})) {
+      const d = new Date(k);
+      if (d < cutoff) {
+        delete m.byDay[k];
+        changed = true;
+      }
+    }
+    if (changed) await saveMetrics(m);
+    return { changed };
+  } catch (e) {
+    return { changed: false };
+  }
+}
+
+// Reset tokens (for password reset)
+async function getResetTokens() {
+  const tokens = await readJSON('resetTokens', {});
+  const obj = (tokens && typeof tokens === 'object') ? tokens : {};
+  // prune expired tokens
+  const now = Date.now();
+  let changed = false;
+  for (const [tok, data] of Object.entries(obj)) {
+    try {
+      const exp = data && data.expiry ? new Date(data.expiry).getTime() : 0;
+      if (!exp || exp < now) {
+        delete obj[tok];
+        changed = true;
+      }
+    } catch (_) {}
+  }
+  if (changed) {
+    await writeJSON('resetTokens', obj);
+  }
+  return obj;
+}
+
+async function saveResetTokens(tokens) {
+  const toSave = (tokens && typeof tokens === 'object') ? tokens : {};
+  await writeJSON('resetTokens', toSave);
+  return toSave;
+}
+
+// Visitors (deviceId-based unique devices)
+// Shape: { [deviceId: string]: { firstSeen: string, lastSeen: string, visits: number, ua?: string, country?: string, lastIp?: string, lastDeviceType?: string } }
+async function getVisitors() {
+  const obj = await readJSON('visitors', {});
+  return (obj && typeof obj === 'object') ? obj : {};
+}
+
+async function saveVisitors(map) {
+  const toSave = (map && typeof map === 'object') ? map : {};
+  await writeJSON('visitors', toSave);
+  return toSave;
+}
+
+// Remove visitors whose lastSeen is older than N days
+async function pruneVisitors(days = 7) {
+  try {
+    const map = await getVisitors();
+    const now = Date.now();
+    const cutoff = now - days * 24 * 60 * 60 * 1000;
+    let changed = false;
+    for (const [id, v] of Object.entries(map)) {
+      try {
+        const last = v && v.lastSeen ? new Date(v.lastSeen).getTime() : 0;
+        if (!last || last < cutoff) {
+          delete map[id];
+          changed = true;
+        }
+      } catch (_) {
+        delete map[id];
+        changed = true;
+      }
+    }
+    if (changed) await saveVisitors(map);
+    return { changed };
+  } catch (e) {
+    return { changed: false };
+  }
+}
+
+module.exports = {
+  getUsers,
+  saveUsers,
+  getSettings,
+  saveSettings,
+  getActivities,
+  addActivity,
+  saveActivities,
+  defaultSettings,
+  // metrics
+  getMetrics,
+  saveMetrics,
+  recordFileProcessed,
+  defaultMetrics,
+  pruneActivities,
+  pruneMetricsByDay,
+  // reset tokens
+  getResetTokens,
+  saveResetTokens,
+  // visitors
+  getVisitors,
+  saveVisitors,
+  pruneVisitors
+};

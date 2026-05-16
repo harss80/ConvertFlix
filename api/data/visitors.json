@@ -1,0 +1,38 @@
+{
+  "c4e6c4feaaadb58b1874c56537b39161": {
+    "firstSeen": "2026-05-12T15:17:18.095Z",
+    "lastSeen": "2026-05-12T15:17:18.167Z",
+    "visits": 2,
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+    "country": "",
+    "lastIp": "::1",
+    "lastDeviceType": "laptop"
+  },
+  "e9ca3a174af1b55b9c94ef987d18d2ad": {
+    "firstSeen": "2026-05-12T15:24:00.301Z",
+    "lastSeen": "2026-05-12T15:48:16.073Z",
+    "visits": 2,
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+    "country": "",
+    "lastIp": "::1",
+    "lastDeviceType": "laptop"
+  },
+  "59c73336a6568191a56579c67c61cf5a": {
+    "firstSeen": "2026-05-12T15:43:06.934Z",
+    "lastSeen": "2026-05-12T15:43:06.934Z",
+    "visits": 1,
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+    "country": "",
+    "lastIp": "::1",
+    "lastDeviceType": "laptop"
+  },
+  "62dad19c4c3e6e2d9ee3e3234f3c5323": {
+    "firstSeen": "2026-05-12T16:03:33.547Z",
+    "lastSeen": "2026-05-15T18:53:53.048Z",
+    "visits": 3,
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+    "country": "",
+    "lastIp": "::1",
+    "lastDeviceType": "laptop"
+  }
+}

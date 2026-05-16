@@ -1,0 +1,181 @@
+/* ═══════════════════════════════════════════════════════════
+   ConvertFlix — Modern Flat Structural (Zero Glows)
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Core Backgrounds (Pure Flat Solids) ── */
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #111111;
+  --bg-card: #000000;
+
+  /* ── Text (High Contrast) ── */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+
+  /* ── Accents (Flat, Solid Neon) ── */
+  --accent-primary: #ffffff;
+  --accent-secondary: #27272a;
+  --accent-brand: #ccff00; /* Flat Neon Chartreuse */
+  --accent-brand-light: #d9ff33;
+  --accent-brand-subtle: rgba(204, 255, 0, 0.1);
+
+  /* ── Borders (Sharp Architectural) ── */
+  --border-color: #27272a;
+  --border-strong: #3f3f46;
+
+  /* ── Shadows (STRICTLY ZERO GLOWS/SHADOWS) ── */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --shadow-glow: none;
+
+  /* ── Form Controls ── */
+  --control-bg: #000000;
+  --control-hover-bg: #111111;
+  --control-border: #27272a;
+  --control-hover-border: #ccff00;
+}
+
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f4f5;
+  --bg-tertiary: #e4e4e7;
+  --bg-card: #ffffff;
+
+  --text-primary: #000000;
+  --text-secondary: #52525b;
+  --text-muted: #a1a1aa;
+
+  --accent-primary: #000000;
+  --accent-secondary: #e4e4e7;
+  --accent-brand: #0055ff; /* Flat Solid Blue */
+  --accent-brand-light: #2266ff;
+  --accent-brand-subtle: rgba(0, 85, 255, 0.1);
+
+  --border-color: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --shadow-glow: none;
+
+  --control-bg: #ffffff;
+  --control-hover-bg: #f4f4f5;
+  --control-border: #e4e4e7;
+  --control-hover-border: #0055ff;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Reset & Base
+   ═══════════════════════════════════════════════════════════ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--bg-primary);
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Brutalist Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); border-left: 1px solid var(--border-color); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-brand); }
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Typography (Bold, Structural)
+   ═══════════════════════════════════════════════════════════ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+h1 { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; letter-spacing: -0.04em; }
+h2 { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; line-height: 1.1; }
+h3 { font-size: clamp(1.25rem, 2.5vw, 1.5rem); }
+h4 { font-size: 1.15rem; font-weight: 700; }
+
+p { margin-bottom: 1rem; text-transform: none; font-weight: 500; letter-spacing: -0.01em; line-height: 1.6; }
+
+a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+a:hover { color: var(--accent-brand); }
+
+.text-gradient {
+  /* Override gradients to solid colors for brutalism */
+  color: var(--accent-brand);
+  background: none;
+  -webkit-text-fill-color: var(--accent-brand);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Utility Classes (Zero Gradients, Pure Structure)
+   ═══════════════════════════════════════════════════════════ */
+
+.container {
+  width: 100%;
+  max-width: 1200px; /* Crucial: Solves the "stuck to corner" issue */
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* The Flat Structural Panel */
+.glass-panel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0; /* Brutalist sharp corners */
+  box-shadow: none;
+  position: relative;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Architectural Grid Pattern (No SVG Noise, No Soft Glows) */
+.bg-grid {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: linear-gradient(var(--border-color) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-glow-purple, .bg-glow-pink {
+  display: none; /* Strictly disabled glows */
+}

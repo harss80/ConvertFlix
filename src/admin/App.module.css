@@ -1,0 +1,44 @@
+.app {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-secondary);
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Apply sidebar offset only when sidebar is present */
+.app.withSidebar .mainContent {
+  margin-left: 280px; /* Sidebar width */
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--bg-secondary);
+}
+
+/* Centered layout for Loading / Access Denied screens */
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0; /* Sidebar is hidden on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    margin-left: 0;
+  }
+}
