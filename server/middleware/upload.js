@@ -2,8 +2,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+const os = require('os');
+const isVercel = process.env.VERCEL === '1';
 // Ensure uploads directory exists and use absolute path
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+const UPLOAD_DIR = isVercel ? path.join(os.tmpdir(), 'uploads') : path.join(__dirname, '..', 'uploads');
 try { fs.mkdirSync(UPLOAD_DIR, { recursive: true }); } catch (_) {}
 
 // Configure storage for different file types

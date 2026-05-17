@@ -3,7 +3,9 @@ const fsp = require('fs').promises;
 const path = require('path');
 const realtime = require('./realtime');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const os = require('os');
+const isVercel = process.env.VERCEL === '1';
+const DATA_DIR = isVercel ? path.join(os.tmpdir(), 'data') : path.join(__dirname, '..', 'data');
 
 async function ensureDir() {
   try {
