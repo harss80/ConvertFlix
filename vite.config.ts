@@ -15,11 +15,16 @@ export default defineConfig({
   build: {
     target: 'esnext',
     cssCodeSplit: true,
+    chunkSizeWarningLimit: 1600, // Increase limit to 1.6MB to silence warnings for large libraries
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@mantine/core', '@mantine/hooks'],
+          ui: ['lucide-react', 'framer-motion', '@mantine/core', '@mantine/hooks'],
+          editor: ['react-filerobot-image-editor'],
+          imgly: ['@imgly/background-removal'],
+          charts: ['recharts'],
+          pdf: ['pdf-lib']
         },
       },
     },
