@@ -114,11 +114,7 @@ router.post('/compress-image', uploadImage, async (req, res) => {
             candidates.push(outputOriginalFmt);
           }
         } catch (_) {}
-        // Also try a fast WebP candidate and pick it only if smaller than original
-        try {
-          await sharp(inputPath, { sequentialRead: true }).webp({ quality: speed === 'turbo' ? 70 : 72, effort: 0 }).toFile(outputWebp);
-          candidates.push(outputWebp);
-        } catch (_) {}
+        // Only use the original format candidate to ensure we don't change the file type
       } else {
         // QUALITY: try multiple candidates and pick the smallest (reduced encoding effort for speed)
         try {
@@ -136,14 +132,7 @@ router.post('/compress-image', uploadImage, async (req, res) => {
           }
           candidates.push(outputOriginalFmt);
         } catch (_) {}
-        try {
-          await sharp(inputPath, { sequentialRead: true }).webp({ quality: 75 }).toFile(outputWebp);
-          candidates.push(outputWebp);
-        } catch (_) {}
-        try {
-          await sharp(inputPath, { sequentialRead: true }).avif({ quality: 35, effort: 2 }).toFile(outputAvif);
-          candidates.push(outputAvif);
-        } catch (_) {}
+        // Only use the original format candidate to ensure we don't change the file type
       }
 
       // Choose the smallest candidate that is actually smaller than the original
